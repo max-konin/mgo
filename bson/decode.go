@@ -705,12 +705,7 @@ func (d *decoder) readElemTo(out reflect.Value, kind byte) (good bool) {
 	case ElementTimestamp: // Mongo-specific timestamp
 		in = MongoTimestamp(d.readInt64())
 	case ElementInt64:
-		switch out.Type() {
-		case typeTimeDuration:
-			in = time.Duration(time.Duration(d.readInt64()) * time.Millisecond)
-		default:
-			in = d.readInt64()
-		}
+		in = d.readInt64()
 	case ElementDecimal128:
 		in = Decimal128{
 			l: uint64(d.readInt64()),

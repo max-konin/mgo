@@ -38,7 +38,7 @@ import (
 	"time"
 	"strings"
 
-	"github.com/globalsign/mgo/bson"
+	"github.com/cgrates/mgo/bson"
 	. "gopkg.in/check.v1"
 )
 
