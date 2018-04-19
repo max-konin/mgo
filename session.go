@@ -318,6 +318,7 @@ func ParseURL(url string) (*DialInfo, error) {
 	setName := ""
 	poolLimit := 0
 	appName := ""
+	ssl := false
 	readPreferenceMode := Primary
 	var readPreferenceTagSets []bson.D
 	for _, opt := range uinfo.options {
@@ -374,6 +375,15 @@ func ParseURL(url string) (*DialInfo, error) {
 			if opt.value == "replicaSet" {
 				break
 			}
+			return nil, errors.New("unsupported connection URL option: " + opt.key + "=" + opt.value)
+		case "ssl":
+			if v == "true" {
+				ssl = true
+				break
+			}
+			if v == "false" {
+				break
+			}
 			fallthrough
 		default:
 			return nil, errors.New("unsupported connection URL option: " + opt.key + "=" + opt.value)
@@ -400,6 +410,7 @@ func ParseURL(url string) (*DialInfo, error) {
 			TagSets: readPreferenceTagSets,
 		},
 		ReplicaSetName: setName,
+		SSL:            ssl,
 	}
 	return &info, nil
 }
@@ -479,6 +490,9 @@ type DialInfo struct {
 
 	// WARNING: This field is obsolete. See DialServer above.
 	Dial func(addr net.Addr) (net.Conn, error)
+
+	// If the connection url indicated an ssl connection should be used
+	SSL bool
 }
 
 // ReadPreference defines the manner in which servers are chosen.
@@ -5262,7 +5276,7 @@ func getRFC2253NameString(RDNElements *pkix.RDNSequence) string {
 	var replacer = strings.NewReplacer(",", "\\,", "=", "\\=", "+", "\\+", "<", "\\<", ">", "\\>", ";", "\\;")
 	//The elements in the sequence needs to be reversed when converting them
 	for i := len(*RDNElements) - 1; i >= 0; i-- {
-		var nameAndValueList = make([]string,len((*RDNElements)[i]))
+		var nameAndValueList = make([]string, len((*RDNElements)[i]))
 		for j, attribute := range (*RDNElements)[i] {
 			var shortAttributeName = rdnOIDToShortName(attribute.Type)
 			if len(shortAttributeName) <= 0 {
