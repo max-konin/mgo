@@ -377,11 +377,11 @@ func ParseURL(url string) (*DialInfo, error) {
 			}
 			return nil, errors.New("unsupported connection URL option: " + opt.key + "=" + opt.value)
 		case "ssl":
-			if v == "true" {
+			if opt.value == "true" {
 				ssl = true
 				break
 			}
-			if v == "false" {
+			if opt.value == "false" {
 				break
 			}
 			fallthrough
